@@ -1043,7 +1043,7 @@ function Kurai_Lib:_createDropdown(tabName, props, flag)
     selectionButton.BackgroundColor3 = Kurai_Lib.Theme.Tab
     selectionButton.Size = UDim2.new(1, 0, 0, 30)
     selectionButton.Position = UDim2.new(0, 0, 0, 20)
-    selectionButton.Text = props.Default or props.State or (props.Options and props.Options[1]) or "Select..."
+    -- Initial text will be set after handling multi/single selection
     selectionButton.Parent = dropdown
 
     local selectionPadding = Instance.new("UIPadding")
@@ -1112,13 +1112,23 @@ function Kurai_Lib:_createDropdown(tabName, props, flag)
     if isMulti then
         -- For multi-selection, initialize as a table
         if type(props.Default) == "table" then
-            selectedOptions = props.Default
+            -- Filter to ensure only valid options are included
+            for _, opt in ipairs(props.Default) do
+                if table.find(options, opt) then
+                    table.insert(selectedOptions, opt)
+                end
+            end
         elseif type(props.State) == "table" then
-            selectedOptions = props.State
+            -- Filter to ensure only valid options are included
+            for _, opt in ipairs(props.State) do
+                if table.find(options, opt) then
+                    table.insert(selectedOptions, opt)
+                end
+            end
         end
     else
         -- For single selection, initialize as a string
-        selectedOption = props.Default or props.State or (options[1] or "")
+        selectedOption = props.Default or props.State or (options[1] or "Select...")
     end
 
     self.Flags = self.Flags or {}
